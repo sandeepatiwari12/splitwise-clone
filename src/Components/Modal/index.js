@@ -27,7 +27,6 @@ const ModalContainer = styled.div`
   background: ${theme.colors.white};
   border-radius: 4px;
   padding: 1rem;
-  margin: 3rem 0;
 `;
 
 const ModalHeader = styled.div`

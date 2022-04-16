@@ -1,32 +1,6 @@
 import React from "react";
 import Input from "../Input";
-import styled from "styled-components";
-import theme from "../../theme";
-
-const StyledUL = styled.ul`
-  position: absolute;
-  background: ${({ theme: mode }) => mode.background};
-  width: 250px;
-  list-style: none;
-  border-radius: 4px;
-  max-height: 200px;
-  overflow-y: auto;
-  box-shadow: ${theme.shadows.button};
-`;
-
-const StyledLI = styled.option`
-  height: 2rem;
-  padding: 0 1rem;
-  display: flex;
-  align-items: center;
-  border-radius: 4px;
-  cursor: pointer;
-  transition: 0.5s all;
-  :hover {
-    background: ${theme.colors.primary};
-    color: ${theme.colors.white};
-  }
-`;
+import Options from "./Options";
 
 const AutoComplete = ({ placeholder, list, searchKey, onValueSelect }) => {
   const [filteredList, setFilteredList] = React.useState([]);
@@ -44,7 +18,7 @@ const AutoComplete = ({ placeholder, list, searchKey, onValueSelect }) => {
     setShowOptions(true);
   };
   const onSelectItem = (e) => {
-    onValueSelect(JSON.parse(e.target.value));
+    onValueSelect(e);
     setFilteredList([]);
     setInputValue("");
     setShowOptions(false);
@@ -58,17 +32,11 @@ const AutoComplete = ({ placeholder, list, searchKey, onValueSelect }) => {
         placeholder={placeholder}
       />
       {showOptions && inputValue && (
-        <StyledUL>
-          {filteredList.map((opt) => (
-            <StyledLI
-              key={opt[searchKey]}
-              value={JSON.stringify(opt)}
-              onClick={onSelectItem}
-            >
-              {opt[searchKey]}
-            </StyledLI>
-          ))}
-        </StyledUL>
+        <Options
+          list={filteredList}
+          searchKey={searchKey}
+          onSelectItem={onSelectItem}
+        />
       )}
     </>
   );

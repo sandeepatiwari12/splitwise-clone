@@ -7,26 +7,14 @@ import {
   ADD_FRIEND_SUCCESS,
   SPLITWISE_FRIENDS,
 } from "../actions/types";
+import _ from "lodash";
 
 const initialState = {
   loading: false,
   list: [],
 };
 
-/*
-{ name: "Sandeep Tiwari", phone: "7718881681" },
-    { name: "Sandeepa Tiwari", phone: "7718881686" },
-    { name: "Sandip Tiwari", phone: "7718881687" },
-    { name: "ABC", phone: "7718881682" },
-    { name: "AABC", phone: "7718881688" },
-    { name: "XYZ", phone: "7718881683" },
-    { name: "XXYZ", phone: "7718881689" },
-    { name: "MNO", phone: "7718881684" },
-    { name: "WXY", phone: "7718881685" },
-*/
-
-
-const friendActions = (state = initialState, action) => {
+export default function (state = initialState, action) {
   const { type, payload, message } = action;
   switch (type) {
     case GET_FRIENDS_REQUEST:
@@ -36,11 +24,13 @@ const friendActions = (state = initialState, action) => {
         loading: true,
       };
     case GET_FRIENDS_SUCCESS:
+      const friends = _.uniqBy([...state.list, ...payload], "name");
+      localStorage.setItem(SPLITWISE_FRIENDS, JSON.stringify(friends));
       return {
         ...state,
         loading: false,
         message: null,
-        list: [...state.list, ...payload],
+        list: friends,
       };
     case GET_FRIENDS_FAILED:
     case ADD_FRIEND_FAILED:
@@ -50,16 +40,13 @@ const friendActions = (state = initialState, action) => {
         loading: false,
       };
     case ADD_FRIEND_SUCCESS:
-      const friendsList = [...new Set([...state.list, payload])];
-      localStorage.setItem(SPLITWISE_FRIENDS, JSON.stringify(friendsList));
       return {
         ...state,
         loading: false,
-        message: 'Friend Added Successfully',
-        list: friendsList,
+        message: "Friend Added Successfully",
+        list: _.uniqBy([...state.list, payload], "name"),
       };
     default:
       return state;
   }
 };
-export default friendActions;

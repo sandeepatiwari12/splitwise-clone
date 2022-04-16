@@ -1,8 +1,8 @@
 import React from "react";
 
 // redux store dependencies
-import store from "./store";
-import { Provider } from "react-redux";
+import { connect } from "react-redux";
+import { loadUser } from "./redux/actions/user";
 
 import { Routes, Route, Navigate } from "react-router-dom";
 // theme imports
@@ -25,30 +25,36 @@ const Main = styled.div`
   padding: 0 2rem 2rem;
 `;
 
-const App = () => {
+const App = ({ loadUser, loading }) => {
   const { theme, themeToggler } = useThemeMode();
-  const themeMode = theme === "light" ? lightTheme : darkTheme;
+  const themeMode = theme === "dark" ? darkTheme : lightTheme;
+  React.useEffect(() => {
+    loadUser();
+  }, [loadUser]);
+  console.log("loading", loading);
+
   return (
-    <Provider store={store}>
-      <ThemeContext>
-        <ThemeProvider theme={themeMode}>
-          <GlobalStyle />
-          <PageWraper>
-            <Header themeColor={theme} themeToggler={themeToggler} />
-            <Main>
-              <Routes>
-                <Route path="/" element={<Navigate to={"/dashboard"} />} />
-                <Route path="/dashboard" element={<Dashboard />} />
-                <Route path="login" element={<Login />} />
-                <Route path="sign-up" element={<SignUp />} />
-                <Route path="/settings" element={<Settings />} />
-              </Routes>
-            </Main>
-          </PageWraper>
-        </ThemeProvider>
-      </ThemeContext>
-    </Provider>
+    <ThemeContext>
+      <ThemeProvider theme={themeMode}>
+        <GlobalStyle />
+        <PageWraper>
+          <Header themeColor={theme} themeToggler={themeToggler} />
+          <Main>
+            <Routes>
+              <Route path="/" element={<Navigate to={"/dashboard"} />} />
+              <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="login" element={<Login />} />
+              <Route path="sign-up" element={<SignUp />} />
+              <Route path="/settings" element={<Settings />} />
+            </Routes>
+          </Main>
+        </PageWraper>
+      </ThemeProvider>
+    </ThemeContext>
   );
 };
 
-export default App;
+const mapStateToProps = (state) => ({
+  loading: state.user.loading,
+});
+export default connect(mapStateToProps, { loadUser })(App);

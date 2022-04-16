@@ -34,10 +34,10 @@ const Dashboard = () => {
   //   // TODO: Add Function to save Friends data to the store
   // };
 
-  const onAddExpence = (event) => {
-    console.log("onAddExpence", event);
-    // TODO: Add Function to save Expences data to the store
-  };
+  // const onAddExpence = (event) => {
+  //   console.log("onAddExpence", event);
+  //   // TODO: Add Function to save Expences data to the store
+  // };
   return (
     <StyledContainer>
       {/* Page Header */}
@@ -61,17 +61,17 @@ const Dashboard = () => {
       {/* Balance Summary */}
       <BalanceSummary />
 
-      <Box style={{marginTop: '1rem'}}>
+      <Box style={{ marginTop: "1rem" }}>
         <Flex>
-          <Box style={{flex: '1'}}>
+          <Box style={{ flex: "1" }}>
             <LargeText>YOU OWE</LargeText>
           </Box>
 
-          <Box style={{flex: '1'}}>
-            <LargeText>YOU ARE OWED</LargeText></Box>
+          <Box style={{ flex: "1" }}>
+            <LargeText>YOU ARE OWED</LargeText>
+          </Box>
         </Flex>
       </Box>
-
 
       {/* Modal */}
       {openAddFriendBox && (
@@ -82,7 +82,7 @@ const Dashboard = () => {
 
       {openAddExpenceBox && (
         <Modal title="Add Expence" onClose={() => setOpenAddExpenceBox(false)}>
-          <AddExpence onFormSubmit={onAddExpence} />
+          <AddExpence onClose={() => setOpenAddExpenceBox(false)}/>
         </Modal>
       )}
     </StyledContainer>

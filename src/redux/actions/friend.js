@@ -7,7 +7,10 @@ import {
   ADD_FRIEND_FAILED,
   SPLITWISE_FRIENDS,
 } from "./types";
-// Load User
+
+import { v4 as uuidv4 } from "uuid";
+
+// Load FriendsList
 export const getFriendsList = () => async (dispatch) => {
   dispatch({
     type: GET_FRIENDS_REQUEST,
@@ -16,7 +19,7 @@ export const getFriendsList = () => async (dispatch) => {
     const friends = JSON.parse(localStorage.getItem(SPLITWISE_FRIENDS));
     dispatch({
       type: GET_FRIENDS_SUCCESS,
-      payload: friends,
+      payload: friends && friends.length > 0 ? friends : [],
     });
   } catch (err) {
     dispatch({
@@ -26,23 +29,24 @@ export const getFriendsList = () => async (dispatch) => {
 };
 
 export const addFriend = (payload) => async (dispatch) => {
+  const friends = JSON.parse(localStorage.getItem(SPLITWISE_FRIENDS));
   dispatch({
     type: ADD_FRIEND_REQUEST,
   });
   try {
-    const friends = JSON.parse(localStorage.getItem(SPLITWISE_FRIENDS));
-    let friendExist = friends.find(({ name }) => name === payload.name);
+    let friendExist =
+      friends && friends.find(({ name }) => name === payload.name);
     if (!friendExist) {
+      payload.id = uuidv4();
       dispatch({
         type: ADD_FRIEND_SUCCESS,
         payload,
       });
-      dispatch(getFriendsList)
-    }
-    else
+      dispatch(getFriendsList());
+    } else
       dispatch({
         type: ADD_FRIEND_FAILED,
-        message: 'The User Already exist'
+        message: "The User Already exist",
       });
   } catch (err) {
     dispatch({
@@ -50,3 +54,31 @@ export const addFriend = (payload) => async (dispatch) => {
     });
   }
 };
+
+
+// export const addExpences = (payload) => async (dispatch) => {
+//   const friends = JSON.parse(localStorage.getItem(SPLITWISE_FRIENDS));
+//   dispatch({
+//     type: ADD_EXPENCES_REQUEST,
+//   });
+//   try {
+//     let friendExist =
+//       friends && friends.find(({ name }) => name === payload.name);
+//     if (!friendExist) {
+//       payload.id = uuidv4();
+//       dispatch({
+//         type: ADD_EXPENCES_SUCCESS,
+//         payload,
+//       });
+//       dispatch(getFriendsList());
+//     } else
+//       dispatch({
+//         type: ADD_EXPENCES_FAILED,
+//         message: "The User Already exist",
+//       });
+//   } catch (err) {
+//     dispatch({
+//       type: ADD_EXPENCES_FAILED,
+//     });
+//   }
+// };

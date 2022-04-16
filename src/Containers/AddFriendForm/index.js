@@ -17,8 +17,10 @@ const AddFriendForm = ({ loading, addFriend, onClose }) => {
 
   const onSubmitForm = async (e) => {
     e.preventDefault();
-    if (Object.keys(errors).length < 1 && Object.keys(values).length > 0)
+    if (Object.keys(errors).length < 1 && Object.keys(values).length > 0) {
+      values.balance = 0;
       await addFriend(values);
+    }
   };
 
   return (
