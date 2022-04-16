@@ -70,11 +70,10 @@ const AddExpence = ({
   const onSubmitForm = async (e) => {
     e.preventDefault();
     if (Object.keys(errors).length < 1 && Object.keys(values).length > 0) {
-      currentUser.balance += constPerPerson;
       const formPayload = {
         ...values,
         ...formObj,
-        splits: [...friends],
+        splits: [...friends, currentUser],
         date: new Date(),
         createdBy: currentUser,
       };
@@ -84,7 +83,7 @@ const AddExpence = ({
 
   const splitTheBill = async (obj) => {
     for (let i = 0; i < obj.splits.length; i++) {
-      obj.splits[i].balance += constPerPerson;
+      obj.splits[i].balance = constPerPerson;
     }
     await addExpences(obj);
     // onClose();
