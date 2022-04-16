@@ -8,6 +8,7 @@ import {
 import { v4 as uuidv4 } from "uuid";
 
 const countDifference = (obj, KEY1, KEY2, key, amount) => {
+  console.log('called', obj, KEY1, KEY2, key, amount);
   const difference = obj[KEY1][key] - amount;
   if (difference > 0) obj[KEY2][key] = difference;
   else {
@@ -37,15 +38,19 @@ const updateFriends = (expenceObj) => {
   }
   let storedTransactions = JSON.parse(localStorage.getItem("transactions"));
 
-  let trackUsers = {
-    youOwe: [],
-    youOwed: [],
-  };
+  let trackUsers = JSON.parse(localStorage.getItem("trackUsers"));
+  if (!trackUsers)
+    trackUsers = {
+      youOwe: [],
+      youOwed: [],
+    };
 
-  let expenseData = {
-    youOwe: {},
-    youOwed: {},
-  };
+  let expenseData = JSON.parse(localStorage.getItem("expenseData"));
+  if (!expenseData)
+    expenseData = {
+      youOwe: {},
+      youOwed: {},
+    };
 
   storedTransactions.forEach((trans) => {
     if (
@@ -114,6 +119,8 @@ const updateFriends = (expenceObj) => {
 
   console.log("expenseData", expenseData);
   console.log("trackUsers", trackUsers);
+  localStorage.setItem("expenseData", JSON.stringify(expenseData));
+  localStorage.setItem("trackUsers", JSON.stringify(trackUsers));
 };
 
 export const addExpences = (payload) => async (dispatch) => {

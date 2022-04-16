@@ -3,11 +3,19 @@ import styled from "styled-components";
 import Button from "../../Components/Button";
 import { Box, Container, Flex } from "../../Components/Layouts";
 import Modal from "../../Components/Modal";
-import { Heading, LargeText, Spacer } from "../../Components/Typography";
+import {
+  BoldText,
+  Heading,
+  Label,
+  Spacer,
+  Text,
+} from "../../Components/Typography";
 import AddExpence from "../../Containers/AddExpence";
 import AddFriendForm from "../../Containers/AddFriendForm";
 import BalanceSummary from "../../Containers/BalanceSummary";
 import theme from "../../theme";
+import { connect } from "react-redux";
+import { getFriendsList } from "../../redux/actions/friend";
 
 const StyledContainer = styled(Container)`
   background: ${theme.colors.gray};
@@ -25,19 +33,39 @@ const ButtonContainer = styled.div`
   column-gap: 20px;
 `;
 
-const Dashboard = () => {
+const Dashboard = ({ getFriendsList, loading, friendList }) => {
   const [openAddFriendBox, setOpenAddFriendBox] = React.useState(false);
   const [openAddExpenceBox, setOpenAddExpenceBox] = React.useState(false);
+  const [youOwes, setYouOwe] = React.useState([]);
+  const [youOweds, setYouOwed] = React.useState([]);
 
-  // const onAddFriend = (event) => {
-  //   console.log("onAddExpence", event);
-  //   // TODO: Add Function to save Friends data to the store
-  // };
+  const createSummary = () => {
+    console.log("friends", friendList);
+    let expenceData = JSON.parse(localStorage.getItem("expenseData"));
+    if (expenceData) {
+      let { youOwe, youOwed } = expenceData;
+      let youOwedArr = [];
+      let youOweArr = [];
+      Object.keys(youOwed).forEach((e) => {
+        let findFriend = friendList.find(({ id }) => id === e);
+        if (findFriend) youOwedArr.push({ ...findFriend, amount: youOwed[e] });
+      });
 
-  // const onAddExpence = (event) => {
-  //   console.log("onAddExpence", event);
-  //   // TODO: Add Function to save Expences data to the store
-  // };
+      Object.keys(youOwe).forEach((e) => {
+        let findFriend = friendList.find(({ id }) => id === e);
+        if (findFriend) youOweArr.push({ ...findFriend, amount: youOwe[e] });
+      });
+      setYouOwed(youOwedArr);
+      setYouOwe(youOweArr);
+    }
+  };
+
+  React.useEffect(() => {
+    getFriendsList();
+    createSummary();
+    // eslint-disable-next-line
+  }, []);
+
   return (
     <StyledContainer>
       {/* Page Header */}
@@ -64,11 +92,31 @@ const Dashboard = () => {
       <Box style={{ marginTop: "1rem" }}>
         <Flex>
           <Box style={{ flex: "1" }}>
-            <LargeText>YOU OWE</LargeText>
+            <BoldText style={{ marginBottom: "2rem" }}>YOU OWE</BoldText>
+            {youOwes &&
+              youOwes.length > 0 &&
+              youOwes.map((val) => (
+                <Box key={val.id} style={{ marginBottom: "1rem" }}>
+                  <Label>{val.name}</Label>
+                  <Text>
+                    you owe: <strong>{val.amount}</strong>
+                  </Text>
+                </Box>
+              ))}
           </Box>
 
           <Box style={{ flex: "1" }}>
-            <LargeText>YOU ARE OWED</LargeText>
+            <BoldText style={{ marginBottom: "2rem" }}>YOU ARE OWED</BoldText>
+            {youOweds &&
+              youOweds.length > 0 &&
+              youOweds.map((val) => (
+                <Box key={val.id} style={{ marginBottom: "1rem" }}>
+                  <Label>{val.name}</Label>
+                  <Text>
+                    owes you: <strong>{val.amount}</strong>
+                  </Text>
+                </Box>
+              ))}
           </Box>
         </Flex>
       </Box>
@@ -76,17 +124,25 @@ const Dashboard = () => {
       {/* Modal */}
       {openAddFriendBox && (
         <Modal title="Add Friend" onClose={() => setOpenAddFriendBox(false)}>
-          <AddFriendForm />
+          <AddFriendForm onClose={() => setOpenAddFriendBox(false)} />
         </Modal>
       )}
 
       {openAddExpenceBox && (
         <Modal title="Add Expence" onClose={() => setOpenAddExpenceBox(false)}>
-          <AddExpence onClose={() => setOpenAddExpenceBox(false)}/>
+          <AddExpence onClose={() => {
+            setOpenAddExpenceBox(false);
+            createSummary()
+            }} />
         </Modal>
       )}
     </StyledContainer>
   );
 };
 
-export default Dashboard;
+const mapStateToProps = (state) => ({
+  loading: state.friends.loading,
+  friendList: state.friends.list,
+});
+
+export default connect(mapStateToProps, { getFriendsList })(Dashboard);

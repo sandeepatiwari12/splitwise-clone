@@ -27,7 +27,7 @@ export const Text = styled.p`
 `;
 
 export const BoldText = styled(Text)`
-  font-weight: 500;
+  font-weight: 600;
 `;
 
 export const LargeText = styled(Text)`
