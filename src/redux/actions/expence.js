@@ -3,9 +3,8 @@ import {
   ADD_EXPENCES_SUCCESS,
   ADD_EXPENCES_FAILED,
   SPLITWISE_EXPENCES,
-  SPLITWISE_FRIENDS,
 } from "./types";
-import _ from "lodash";
+// import _ from "lodash";
 import { v4 as uuidv4 } from "uuid";
 
 const countDifference = (obj, KEY1, KEY2, key, amount) => {

@@ -11,7 +11,7 @@ const initialState = {
   list: [],
 };
 
-export default function (state = initialState, action) {
+const expenceReducer = (state = initialState, action) => {
   const { type, payload, message } = action;
   switch (type) {
     case ADD_EXPENCES_REQUEST:
@@ -37,4 +37,6 @@ export default function (state = initialState, action) {
     default:
       return state;
   }
-}
+};
+
+export default expenceReducer;

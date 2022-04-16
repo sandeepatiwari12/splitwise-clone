@@ -11,11 +11,11 @@ const initialState = {
     id: "user_1",
     name: "Sandeep",
     phone: "9988810123",
-    balance: 0
+    balance: 0,
   },
 };
 
-export default function (state = initialState, action) {
+const userReducer = (state = initialState, action) => {
   const { type, message } = action;
   const userData = JSON.parse(localStorage.getItem(SPLITWISE_USER));
   switch (type) {
@@ -42,4 +42,5 @@ export default function (state = initialState, action) {
     default:
       return state;
   }
-}
+};
+export default userReducer;

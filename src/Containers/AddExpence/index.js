@@ -32,7 +32,7 @@ const AddExpence = ({
   onClose,
 }) => {
   const { values, errors, onInputChange } = useForm();
-  const [splitMethod, setSplitMethod] = React.useState("EQUAL");
+  const [splitMethod] = React.useState("EQUAL");
   const [formObj, setFormObj] = React.useState({
     paidBy: currentUser.id,
     splitBy: splitMethod,
@@ -86,7 +86,7 @@ const AddExpence = ({
       obj.splits[i].balance = constPerPerson;
     }
     await addExpences(obj);
-    // onClose();
+    onClose();
   };
 
   return (

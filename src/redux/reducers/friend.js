@@ -14,7 +14,7 @@ const initialState = {
   list: [],
 };
 
-export default function (state = initialState, action) {
+const friendReducer = (state = initialState, action) => {
   const { type, payload, message } = action;
   switch (type) {
     case GET_FRIENDS_REQUEST:
@@ -50,3 +50,4 @@ export default function (state = initialState, action) {
       return state;
   }
 };
+export default friendReducer;
