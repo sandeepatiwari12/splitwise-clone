@@ -1,12 +1,14 @@
 import colors from "./colors";
 
 export const darkTheme = {
-  background: colors.black,
+  background: colors.darkBG,
+  sectionBg: colors.sectionBG,
   text: colors.white,
 };
 
 export const lightTheme = {
-  background: colors.white,
+  background: colors.lightBG,
+  sectionBg: colors.gray,
   text: colors.black,
 };
 

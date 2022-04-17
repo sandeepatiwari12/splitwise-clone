@@ -23,8 +23,8 @@ const ModalContainer = styled.div`
   transform: translate(-50%, -50%);
   min-width: 45%;
   max-width: 50%;
-  border: 2px solid ${theme.colors.white};
-  background: ${theme.colors.white};
+  border: 2px solid ${({ theme: mode }) => mode.sectionBg};
+  background: ${({ theme: mode }) => mode.sectionBg};
   border-radius: 4px;
   padding: 1rem;
 `;
@@ -35,8 +35,8 @@ const ModalHeader = styled.div`
 `;
 
 const ModalTitle = styled(Heading2)`
-  color: ${theme.colors.black};
   margin: 0;
+  font-size: ${({ small }) => (small ? 1.8 : 2.5)}rem;
 `;
 
 const ModalBody = styled.div`
@@ -45,14 +45,14 @@ const ModalBody = styled.div`
   position: relative;
 `;
 
-const Modal = ({ title, children, onClose }) => {
+const Modal = ({ title, children, onClose, small }) => {
   return (
     <ModalWrapper>
       <ModalContainer>
         <ModalHeader>
-          {title && <ModalTitle>{title}</ModalTitle>}
+          {title && <ModalTitle small={small}>{title}</ModalTitle>}
           <Spacer />
-          <Button outlined onClick={onClose} variant={'error'}>
+          <Button outlined onClick={onClose} variant={"error"}>
             {"Close"}
           </Button>
         </ModalHeader>

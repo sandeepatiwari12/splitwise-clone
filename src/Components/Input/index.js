@@ -8,12 +8,16 @@ const Input = styled.input`
   border: 1px solid #ccc;
   padding: 0 1rem;
   font-size: 1rem;
-  transition: .5s ease;
-  margin-top: .5rem;
-  margin-bottom: .5rem;
+  transition: 0.5s ease;
+  margin-top: 0.5rem;
+  margin-bottom: 0.5rem;
+  background-color: ${({ theme }) => theme.sectionBg};
+  color: ${({ theme }) => theme.text};
   :focus {
-    border-color: #000;
+    border-color: ${({ theme }) => theme.text};
   }
 `;
 
 export default Input;
+
+// ${({ theme }) => theme.sectionBg};

@@ -2,24 +2,36 @@ import {
   ADD_EXPENCES_REQUEST,
   ADD_EXPENCES_SUCCESS,
   ADD_EXPENCES_FAILED,
+  GET_EXPENCES_REQUEST,
+  GET_EXPENCES_SUCCESS,
+  GET_EXPENCES_FAILED,
   SPLITWISE_EXPENCES,
+  SPLITWISE_EXPENCE_DATA,
+  SPLITWISE_TRACK_USERS,
 } from "./types";
-// import _ from "lodash";
 import { v4 as uuidv4 } from "uuid";
 
-const countDifference = (obj, KEY1, KEY2, key, amount) => {
-  console.log('called', obj, KEY1, KEY2, key, amount);
-  const difference = obj[KEY1][key] - amount;
-  if (difference > 0) obj[KEY2][key] = difference;
-  else {
+const countDifferences = (obj, KEY1, KEY2, key, amount) => {
+  const difference =
+    obj[KEY1][key] > amount ? obj[KEY1][key] - amount : amount - obj[KEY1][key];
+
+  if (difference > 0) {
+    if (obj[KEY1][key] > amount) {
+      obj[KEY1][key] = difference;
+      delete obj[KEY2][key];
+    } else {
+      obj[KEY2][key] = difference;
+      delete obj[KEY1][key];
+    }
+  } else {
     delete obj[KEY1][key];
-    delete obj[KEY2][key];
   }
 };
 
 const updateFriends = (expenceObj) => {
   const transactions = expenceObj.splits.map((split) => {
     return {
+      ...expenceObj,
       paidBy: expenceObj.paidBy,
       paidFor: split.id,
       amount: split.balance,
@@ -27,124 +39,102 @@ const updateFriends = (expenceObj) => {
     };
   });
 
-  let transactionsLocal = JSON.parse(localStorage.getItem("transactions"));
+  let transactionsLocal = JSON.parse(localStorage.getItem(SPLITWISE_EXPENCES));
   if (transactionsLocal) {
     localStorage.setItem(
-      "transactions",
+      SPLITWISE_EXPENCES,
       JSON.stringify([...transactionsLocal, ...transactions])
     );
   } else {
-    localStorage.setItem("transactions", JSON.stringify([...transactions]));
+    localStorage.setItem(SPLITWISE_EXPENCES, JSON.stringify(transactions));
   }
-  let storedTransactions = JSON.parse(localStorage.getItem("transactions"));
+  let storedTransactions = JSON.parse(localStorage.getItem(SPLITWISE_EXPENCES));
 
-  let trackUsers = JSON.parse(localStorage.getItem("trackUsers"));
-  if (!trackUsers)
-    trackUsers = {
-      youOwe: [],
-      youOwed: [],
-    };
-
-  let expenseData = JSON.parse(localStorage.getItem("expenseData"));
-  if (!expenseData)
-    expenseData = {
-      youOwe: {},
-      youOwed: {},
-    };
+  let trackUsers = {
+    youOwe: [],
+    youOwed: [],
+  };
+  let expenseData = {
+    youOwe: {},
+    youOwed: {},
+  };
 
   storedTransactions.forEach((trans) => {
+    let { paidBy, paidFor, amount } = trans;
     if (
-      trans.paidBy === expenceObj.createdBy.id &&
-      trans.paidFor === expenceObj.createdBy.id
+      paidBy === expenceObj.createdBy.id &&
+      paidFor === expenceObj.createdBy.id
     )
       return;
 
-    if (trans.paidBy === expenceObj.createdBy.id) {
-      if (trackUsers.youOwed.indexOf(trans.paidFor) === -1) {
-        if (expenseData.youOwe[trans.paidFor]) {
-          countDifference(
-            expenseData,
-            "youOwe",
-            "youOwed",
-            trans.paidFor,
-            trans.amount
-          );
+    if (paidBy === expenceObj.createdBy.id) {
+      if (trackUsers.youOwed.indexOf(paidFor) === -1) {
+        if (expenseData.youOwe[paidFor]) {
+          countDifferences(expenseData, "youOwe", "youOwed", paidFor, amount);
         } else {
-          expenseData.youOwed[trans.paidFor] = trans.amount;
-          trackUsers.youOwed.push(trans.paidFor);
+          expenseData.youOwed[paidFor] = amount;
+          trackUsers.youOwed.push(paidFor);
         }
       } else {
-        if (expenseData.youOwe[trans.paidFor]) {
-          countDifference(
-            expenseData,
-            "youOwe",
-            "youOwed",
-            trans.paidFor,
-            trans.amount
-          );
+        if (expenseData.youOwe[paidFor]) {
+          countDifferences(expenseData, "youOwe", "youOwed", paidFor, amount);
         } else {
-          expenseData.youOwed[trans.paidFor] += trans.amount;
+          expenseData.youOwed[paidFor] += amount;
         }
       }
     }
-    if (trans.paidFor === expenceObj.createdBy.id) {
-      if (trackUsers.youOwe.indexOf(trans.paidBy) === -1) {
-        if (expenseData.youOwed[trans.paidBy]) {
-          countDifference(
-            expenseData,
-            "youOwed",
-            "youOwe",
-            trans.paidBy,
-            trans.amount
-          );
+    if (paidFor === expenceObj.createdBy.id) {
+      if (trackUsers.youOwe.indexOf(paidBy) === -1) {
+        if (expenseData.youOwed[paidBy]) {
+          countDifferences(expenseData, "youOwed", "youOwe", paidBy, amount);
         } else {
-          expenseData.youOwe[trans.paidBy] = trans.amount;
-          trackUsers.youOwe.push(trans.paidBy);
+          expenseData.youOwe[paidBy] = amount;
+          trackUsers.youOwe.push(paidBy);
         }
       } else {
-        if (expenseData.youOwed[trans.paidBy]) {
-          countDifference(
-            expenseData,
-            "youOwed",
-            "youOwe",
-            trans.paidBy,
-            trans.amount
-          );
+        if (expenseData.youOwed[paidBy]) {
+          countDifferences(expenseData, "youOwed", "youOwe", paidBy, amount);
         } else {
-          expenseData.youOwe[trans.paidBy] += trans.amount;
+          expenseData.youOwe[paidBy] += amount;
         }
       }
     }
   });
-
-  console.log("expenseData", expenseData);
-  console.log("trackUsers", trackUsers);
-  localStorage.setItem("expenseData", JSON.stringify(expenseData));
-  localStorage.setItem("trackUsers", JSON.stringify(trackUsers));
+  localStorage.setItem(SPLITWISE_EXPENCE_DATA, JSON.stringify(expenseData));
+  localStorage.setItem(SPLITWISE_TRACK_USERS, JSON.stringify(trackUsers));
 };
 
 export const addExpences = (payload) => async (dispatch) => {
-  const expences = JSON.parse(localStorage.getItem(SPLITWISE_EXPENCES));
   dispatch({
     type: ADD_EXPENCES_REQUEST,
   });
   try {
-    let expenceExist = expences && expences.find(({ id }) => id === payload.id);
-    if (!expenceExist) {
-      payload.id = uuidv4();
-      dispatch(updateFriends(payload));
-      dispatch({
-        type: ADD_EXPENCES_SUCCESS,
-        payload,
-      });
-    } else
-      dispatch({
-        type: ADD_EXPENCES_FAILED,
-        message: "Expence already exists",
-      });
+    payload.id = uuidv4();
+    dispatch(updateFriends(payload));
+    dispatch({
+      type: ADD_EXPENCES_SUCCESS,
+      payload,
+    });
   } catch (err) {
     dispatch({
       type: ADD_EXPENCES_FAILED,
+    });
+  }
+};
+
+export const getExpenceSummary = () => async (dispatch) => {
+  dispatch({
+    type: GET_EXPENCES_REQUEST,
+  });
+  try {
+    const expenceData = JSON.parse(localStorage.getItem(SPLITWISE_EXPENCE_DATA));
+    dispatch({
+      type: GET_EXPENCES_SUCCESS,
+      payload: expenceData
+    });
+  } catch (err) {
+    dispatch({
+      type: GET_EXPENCES_FAILED,
     });
   }
 };

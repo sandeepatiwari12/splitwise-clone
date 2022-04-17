@@ -1,33 +1,31 @@
 import {
-  ADD_EXPENCES_REQUEST,
-  ADD_EXPENCES_SUCCESS,
-  ADD_EXPENCES_FAILED,
-  SPLITWISE_EXPENCES,
+  GET_EXPENCES_REQUEST,
+  GET_EXPENCES_SUCCESS,
+  GET_EXPENCES_FAILED,
 } from "../actions/types";
 import _ from "lodash";
 
 const initialState = {
   loading: false,
-  list: [],
+  summary: {},
 };
 
 const expenceReducer = (state = initialState, action) => {
   const { type, payload, message } = action;
   switch (type) {
-    case ADD_EXPENCES_REQUEST:
+    case GET_EXPENCES_REQUEST:
       return {
         ...state,
         loading: true,
       };
-    case ADD_EXPENCES_SUCCESS:
-      let expences = JSON.parse(localStorage.getItem(SPLITWISE_EXPENCES));
+    case GET_EXPENCES_SUCCESS:
       return {
         ...state,
         loading: false,
-        message: "Expence Added Successfully",
-        list: expences,
+        message: "Summary loaded Successfully",
+        summary: payload,
       };
-    case ADD_EXPENCES_FAILED:
+    case GET_EXPENCES_FAILED:
       return {
         ...state,
         message,

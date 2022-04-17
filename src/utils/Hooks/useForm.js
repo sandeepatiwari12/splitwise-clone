@@ -12,7 +12,7 @@ const useForm = () => {
         if (value.length < 3) {
           setErrors({
             ...errors,
-            name: "The Name should be valid",
+            name: "Name should contain atleat 3 characters",
           });
         } else {
           let newObj = omit(errors, "name");
@@ -28,7 +28,7 @@ const useForm = () => {
         ) {
           setErrors({
             ...errors,
-            phone: "The Phone number should be valid",
+            phone: "Not a valid phone number",
           });
         } else {
           let newObj = omit(errors, "phone");

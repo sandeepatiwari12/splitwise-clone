@@ -14,11 +14,13 @@ import AddExpence from "../../Containers/AddExpence";
 import AddFriendForm from "../../Containers/AddFriendForm";
 import BalanceSummary from "../../Containers/BalanceSummary";
 import theme from "../../theme";
+
 import { connect } from "react-redux";
 import { getFriendsList } from "../../redux/actions/friend";
+import { getExpenceSummary } from "../../redux/actions/expence";
 
 const StyledContainer = styled(Container)`
-  background: ${theme.colors.gray};
+  background: ${({ theme: mode }) => mode.sectionBg};
   border-radius: 0 0 4px 4px;
 `;
 
@@ -33,28 +35,33 @@ const ButtonContainer = styled.div`
   column-gap: 20px;
 `;
 
-const Dashboard = ({ getFriendsList, loading, friendList }) => {
+const Dashboard = ({
+  getFriendsList,
+  loading,
+  friendList,
+  getExpenceSummary,
+  expenceData,
+}) => {
   const [openAddFriendBox, setOpenAddFriendBox] = React.useState(false);
   const [openAddExpenceBox, setOpenAddExpenceBox] = React.useState(false);
   const [youOwes, setYouOwe] = React.useState([]);
   const [youOweds, setYouOwed] = React.useState([]);
 
-  const createSummary = () => {
-    console.log("friends", friendList);
-    let expenceData = JSON.parse(localStorage.getItem("expenseData"));
+  const createOweArray = (obj) => {
+    let arr = [];
+    Object.keys(obj).forEach((e) => {
+      let findFriend = friendList.find(({ id }) => id === e);
+      if (findFriend) arr.push({ ...findFriend, amount: obj[e] });
+    });
+    return arr;
+  };
+
+  const createSummary = async () => {
+    getExpenceSummary();
     if (expenceData) {
       let { youOwe, youOwed } = expenceData;
-      let youOwedArr = [];
-      let youOweArr = [];
-      Object.keys(youOwed).forEach((e) => {
-        let findFriend = friendList.find(({ id }) => id === e);
-        if (findFriend) youOwedArr.push({ ...findFriend, amount: youOwed[e] });
-      });
-
-      Object.keys(youOwe).forEach((e) => {
-        let findFriend = friendList.find(({ id }) => id === e);
-        if (findFriend) youOweArr.push({ ...findFriend, amount: youOwe[e] });
-      });
+      let youOwedArr = youOwed && createOweArray(youOwed);
+      let youOweArr = youOwe && createOweArray(youOwe);
       setYouOwed(youOwedArr);
       setYouOwe(youOweArr);
     }
@@ -62,9 +69,12 @@ const Dashboard = ({ getFriendsList, loading, friendList }) => {
 
   React.useEffect(() => {
     getFriendsList();
+    getExpenceSummary();
+  }, [getFriendsList, getExpenceSummary]);
+
+  React.useEffect(() => {
     createSummary();
-    // eslint-disable-next-line
-  }, []);
+  }, [friendList]);
 
   return (
     <StyledContainer>
@@ -96,12 +106,16 @@ const Dashboard = ({ getFriendsList, loading, friendList }) => {
             {youOwes &&
               youOwes.length > 0 &&
               youOwes.map((val) => (
-                <Box key={val.id} style={{ marginBottom: "1rem" }}>
-                  <Label>{val.name}</Label>
-                  <Text>
-                    you owe: <strong>{val.amount}</strong>
-                  </Text>
-                </Box>
+                <React.Fragment key={val.id}>
+                  {val.amount > 0 && (
+                    <Box key={val.id} style={{ marginBottom: "1rem" }}>
+                      <Label>{val.name}</Label>
+                      <Text>
+                        you owe: <strong>{val.amount}</strong>
+                      </Text>
+                    </Box>
+                  )}
+                </React.Fragment>
               ))}
           </Box>
 
@@ -110,12 +124,16 @@ const Dashboard = ({ getFriendsList, loading, friendList }) => {
             {youOweds &&
               youOweds.length > 0 &&
               youOweds.map((val) => (
-                <Box key={val.id} style={{ marginBottom: "1rem" }}>
-                  <Label>{val.name}</Label>
-                  <Text>
-                    owes you: <strong>{val.amount}</strong>
-                  </Text>
-                </Box>
+                <React.Fragment key={val.id}>
+                  {val.amount > 0 && (
+                    <Box key={val.id} style={{ marginBottom: "1rem" }}>
+                      <Label>{val.name}</Label>
+                      <Text>
+                        owes you: <strong>{val.amount}</strong>
+                      </Text>
+                    </Box>
+                  )}
+                </React.Fragment>
               ))}
           </Box>
         </Flex>
@@ -130,10 +148,12 @@ const Dashboard = ({ getFriendsList, loading, friendList }) => {
 
       {openAddExpenceBox && (
         <Modal title="Add Expence" onClose={() => setOpenAddExpenceBox(false)}>
-          <AddExpence onClose={() => {
-            setOpenAddExpenceBox(false);
-            createSummary()
-            }} />
+          <AddExpence
+            onClose={() => {
+              setOpenAddExpenceBox(false);
+              createSummary();
+            }}
+          />
         </Modal>
       )}
     </StyledContainer>
@@ -143,6 +163,9 @@ const Dashboard = ({ getFriendsList, loading, friendList }) => {
 const mapStateToProps = (state) => ({
   loading: state.friends.loading,
   friendList: state.friends.list,
+  expenceData: state.expenceSummary.summary,
 });
 
-export default connect(mapStateToProps, { getFriendsList })(Dashboard);
+export default connect(mapStateToProps, { getFriendsList, getExpenceSummary })(
+  Dashboard
+);

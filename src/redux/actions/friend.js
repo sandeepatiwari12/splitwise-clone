@@ -54,31 +54,3 @@ export const addFriend = (payload) => async (dispatch) => {
     });
   }
 };
-
-
-// export const addExpences = (payload) => async (dispatch) => {
-//   const friends = JSON.parse(localStorage.getItem(SPLITWISE_FRIENDS));
-//   dispatch({
-//     type: ADD_EXPENCES_REQUEST,
-//   });
-//   try {
-//     let friendExist =
-//       friends && friends.find(({ name }) => name === payload.name);
-//     if (!friendExist) {
-//       payload.id = uuidv4();
-//       dispatch({
-//         type: ADD_EXPENCES_SUCCESS,
-//         payload,
-//       });
-//       dispatch(getFriendsList());
-//     } else
-//       dispatch({
-//         type: ADD_EXPENCES_FAILED,
-//         message: "The User Already exist",
-//       });
-//   } catch (err) {
-//     dispatch({
-//       type: ADD_EXPENCES_FAILED,
-//     });
-//   }
-// };

@@ -2,7 +2,7 @@ import React from "react";
 import styled from "styled-components";
 import theme from "../../theme";
 
-const StyledUL = styled.ul`
+export const List = styled.ul`
   position: absolute;
   background: ${({ theme: mode }) => mode.background};
   width: 250px;
@@ -13,7 +13,7 @@ const StyledUL = styled.ul`
   box-shadow: ${theme.shadows.button};
 `;
 
-const StyledLI = styled.option`
+export const ListItem = styled.option`
   height: 2rem;
   padding: 0 1rem;
   display: flex;
@@ -30,17 +30,17 @@ const StyledLI = styled.option`
 const Options = ({ list, searchKey, onSelectItem }) => {
   const onOptionSelect = (e) => onSelectItem(JSON.parse(e.target.value));
   return (
-    <StyledUL>
+    <List>
       {list.map((opt) => (
-        <StyledLI
+        <ListItem
           key={opt[searchKey]}
           value={JSON.stringify(opt)}
           onClick={onOptionSelect}
         >
           {opt[searchKey]}
-        </StyledLI>
+        </ListItem>
       ))}
-    </StyledUL>
+    </List>
   );
 };
 

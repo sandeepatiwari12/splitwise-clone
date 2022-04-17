@@ -3,16 +3,16 @@ import styled from "styled-components";
 import AutoComplete from "../../Components/AutoComplete";
 import Button from "../../Components/Button";
 import Input from "../../Components/Input";
-import { Label, Text } from "../../Components/Typography";
+import { BoldText, Label, Text } from "../../Components/Typography";
 import useForm from "../../utils/Hooks/useForm";
 import Options from "../../Components/AutoComplete/Options";
+
 import _ from "lodash";
 
 import { connect } from "react-redux";
 import { getFriendsList } from "../../redux/actions/friend";
 import { addExpences } from "../../redux/actions/expence";
-// import AddFriendForm from "../AddFriendForm";
-// import Modal from "../../Components/Modal";
+import Modal from "../../Components/Modal";
 
 const FormField = styled.div`
   margin-bottom: 1.5rem;
@@ -32,16 +32,14 @@ const AddExpence = ({
   onClose,
 }) => {
   const { values, errors, onInputChange } = useForm();
-  const [splitMethod] = React.useState("EQUAL");
   const [formObj, setFormObj] = React.useState({
     paidBy: currentUser.id,
-    splitBy: splitMethod,
   });
   const [friends, setFriends] = React.useState([]);
   const [paidBy, setPaidBy] = React.useState("You");
   const [paidByOpened, openPaidBy] = React.useState(false);
-  const [constPerPerson, setCostPerPerson] = React.useState(0);
-  // const [addFriendsBoxOpened, openAddnewFriendBox] = React.useState(false);
+  const [splitByOpened, openSplitBy] = React.useState(false);
+  const [costPerPerson, setCostPerPerson] = React.useState(0);
   const searchKey = "name";
 
   React.useEffect(() => {
@@ -50,9 +48,9 @@ const AddExpence = ({
 
   const onValueSelect = (e) => {
     let alreadyAdded = friends.find(({ name }) => name === e.name);
-    if (!alreadyAdded) setFriends([...friends, e]);
-    // TODO: Add show error message
-    else alert("Friend already added");
+    if (!alreadyAdded) {
+      setFriends([...friends, e]);
+    } else alert("Friend already added");
   };
 
   const onSelectPaidBy = (value) => {
@@ -65,7 +63,28 @@ const AddExpence = ({
     const cost = e.target.value;
     setCostPerPerson(_.round(cost / (friends.length + 1), 2));
   };
-  // const onSelectSplitBy = (value) => {};
+
+  const splitTheBill = async (splits) => {
+    for (let i = 0; i < splits.length; i++) {
+      splits[i].balance = splits[i].exclude ? 0 : costPerPerson;
+    }
+    return splits;
+  };
+
+  const excludeFriend = (e) => {
+    e.stopPropagation();
+    let splits = [...formObj.splits];
+    const id = e.target.value;
+    const checked = e.target.checked;
+    for (let i = 0; i < splits.length; i++) {
+      if (splits[i].id === id) {
+        splits[i].exclude = checked;
+      }
+    }
+    const filteredSplits = splits.filter((e) => !e.exclude);
+    setCostPerPerson(_.round(values.cost / filteredSplits.length, 2));
+    setFormObj({ ...formObj, splits: splits });
+  };
 
   const onSubmitForm = async (e) => {
     e.preventDefault();
@@ -77,26 +96,14 @@ const AddExpence = ({
         date: new Date(),
         createdBy: currentUser,
       };
-      await splitTheBill(formPayload);
+      formPayload.splits = await splitTheBill(formPayload.splits);
+      await addExpences(formPayload);
+      onClose();
     }
-  };
-
-  const splitTheBill = async (obj) => {
-    for (let i = 0; i < obj.splits.length; i++) {
-      obj.splits[i].balance = constPerPerson;
-    }
-    await addExpences(obj);
-    onClose();
   };
 
   return (
     <>
-      {/* <Button onClick={() => openAddnewFriendBox(true)}>Add new</Button>
-      {addFriendsBoxOpened && (
-        <Modal onClose={() => openAddnewFriendBox(false)}>
-          <AddFriendForm onClose={() => openAddnewFriendBox(false)} />
-        </Modal>
-      )} */}
       <form onSubmit={onSubmitForm} id={"addExpenceForm"}>
         {friends && friends.length > 0 && (
           <FormField>
@@ -152,17 +159,28 @@ const AddExpence = ({
                 <Chips onClick={() => openPaidBy(!paidByOpened)} outlined>
                   {paidBy}
                 </Chips>
-                and Split Equally
+                and Split{" "}
+                <Chips
+                  onClick={() => {
+                    setFormObj({
+                      ...formObj,
+                      splits: [currentUser, ...friends],
+                    });
+                    openSplitBy(!splitByOpened);
+                  }}
+                >
+                  Equally
+                </Chips>
               </Label>
               {paidByOpened && (
                 <Options
-                  list={friends}
+                  list={[{ ...currentUser, name: "You" }, ...friends]}
                   searchKey={searchKey}
                   onSelectItem={onSelectPaidBy}
                 />
               )}
               <Text style={{ marginTop: ".5rem" }}>
-                <Label>{`(${constPerPerson}/person)`}</Label>
+                <Label>{`(${costPerPerson}/person)`}</Label>
               </Text>
             </FormField>
             <Button
@@ -174,6 +192,31 @@ const AddExpence = ({
           </>
         )}
       </form>
+      {splitByOpened && (
+        <Modal onClose={() => openSplitBy(false)} title={"Exclude friends"} small>
+          {formObj.splits &&
+            formObj.splits.length > 0 &&
+            formObj.splits.map((friend) => (
+              <BoldText
+                key={friend.id}
+                style={{ marginBottom: "1rem", cursor: "pointer" }}
+              >
+                <input
+                  type={"checkbox"}
+                  value={friend.id}
+                  id={friend.id}
+                  onChange={excludeFriend}
+                />
+                <Label
+                  style={{ marginLeft: "1rem", cursor: "pointer" }}
+                  htmlFor={friend.id}
+                >
+                  {friend.name}: {!friend.exclude && costPerPerson}
+                </Label>
+              </BoldText>
+            ))}
+        </Modal>
+      )}
     </>
   );
 };
