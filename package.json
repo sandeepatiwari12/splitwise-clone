@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "express": "^4.17.3",
     "react": "^18.0.0",
     "react-dom": "^18.0.0",
     "react-redux": "^7.2.8",
@@ -11,13 +12,12 @@
     "redux": "^4.1.2",
     "redux-thunk": "^2.4.1",
     "styled-components": "^5.3.5",
-    "uuid": "8.3.2"
-  },
-  "devDependencies": {
+    "uuid": "8.3.2",
     "redux-devtools-extension": "2.13.9"
   },
   "scripts": {
-    "start": "react-scripts start",
+    "start": "node server/index.js",
+    "dev": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
