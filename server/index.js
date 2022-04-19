@@ -8,5 +8,5 @@ app.get("*", (req, res) => {
   res.sendFile(path.join(publicPath, "index.html"));
 });
 app.listen(port, () => {
-  console.log("Server is up!");
+  console.log("Server started successfully");
 });
