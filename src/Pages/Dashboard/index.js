@@ -74,6 +74,7 @@ const Dashboard = ({
 
   React.useEffect(() => {
     createSummary();
+    // eslint-disable-next-line
   }, [friendList]);
 
   return (
@@ -151,7 +152,8 @@ const Dashboard = ({
           <AddExpence
             onClose={() => {
               setOpenAddExpenceBox(false);
-              createSummary();
+              getFriendsList();
+              getExpenceSummary();
             }}
           />
         </Modal>

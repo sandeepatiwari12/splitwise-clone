@@ -3,7 +3,6 @@ import styled from "styled-components";
 import { Heading2, Spacer } from "../Typography";
 import PropTypes from "prop-types";
 import Button from "../Button";
-import theme from "../../theme";
 
 const ModalWrapper = styled.div`
   position: fixed;

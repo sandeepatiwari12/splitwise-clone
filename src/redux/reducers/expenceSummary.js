@@ -3,7 +3,6 @@ import {
   GET_EXPENCES_SUCCESS,
   GET_EXPENCES_FAILED,
 } from "../actions/types";
-import _ from "lodash";
 
 const initialState = {
   loading: false,
