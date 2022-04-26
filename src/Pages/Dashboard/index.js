@@ -14,6 +14,7 @@ import AddExpence from "../../Containers/AddExpence";
 import AddFriendForm from "../../Containers/AddFriendForm";
 import BalanceSummary from "../../Containers/BalanceSummary";
 import theme from "../../theme";
+import _ from 'lodash';
 
 import { connect } from "react-redux";
 import { getFriendsList } from "../../redux/actions/friend";
@@ -112,7 +113,7 @@ const Dashboard = ({
                     <Box key={val.id} style={{ marginBottom: "1rem" }}>
                       <Label>{val.name}</Label>
                       <Text>
-                        you owe: <strong>{val.amount}</strong>
+                        you owe: <strong>{_.round(val.amount, 2)}</strong>
                       </Text>
                     </Box>
                   )}
@@ -130,7 +131,7 @@ const Dashboard = ({
                     <Box key={val.id} style={{ marginBottom: "1rem" }}>
                       <Label>{val.name}</Label>
                       <Text>
-                        owes you: <strong>{val.amount}</strong>
+                        owes you: <strong>{_.round(val.amount, 2)}</strong>
                       </Text>
                     </Box>
                   )}

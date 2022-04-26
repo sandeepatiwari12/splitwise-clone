@@ -1,10 +1,10 @@
 import React from "react";
 import styled from "styled-components";
-import Button from "../Button";
 import NavLinks from "../NavLinks";
 import theme from "../../theme";
 import { Link } from "react-router-dom";
 import { Spacer } from "../Typography";
+
 const logo = require("../../Images/logo.png");
 
 const HeaderContainer = styled.div`
@@ -30,13 +30,12 @@ const BrandIcon = styled.img`
   margin-right: 20px;
 `;
 
-
 const StyledLink = styled(Link)`
   display: flex;
   text-decoration: none;
 `;
 
-const Header = ({ themeColor, themeToggler }) => {
+const Header = () => {
   return (
     <HeaderContainer>
       <StyledLink to={"/dashboard"}>
@@ -45,9 +44,6 @@ const Header = ({ themeColor, themeToggler }) => {
       </StyledLink>
       <Spacer />
       <NavLinks />
-      <Button onClick={themeToggler} outlined variant={"success"}>
-        {themeColor === "light" ? "Dark Mode" : "Light Mode"}
-      </Button>
     </HeaderContainer>
   );
 };

@@ -9,27 +9,28 @@ const BalanceBox = styled(Box)`
   background: ${({ theme }) => theme.background};
   border-radius: 4px;
   label {
-    color: ${colors.darkGray}
+    color: ${colors.darkGray};
   }
 `;
 
-const BalanceSummary = () => {
+const BalanceSummary = ({ totalBalance, youOwe, youOwed }) => {
+  console.log('totalBalance, youOwe, youOwed', totalBalance, youOwe, youOwed)
   return (
     <BalanceBox>
       <Flex>
         <Box>
           <Label>Total Balance</Label>
-          <BoldText style={{ color: colors.primary }}>$5000</BoldText>
+          <BoldText style={{ color: colors.primary }}>5000</BoldText>
         </Box>
         <Spacer />
         <Box>
           <Label>You owe</Label>
-          <BoldText style={{ color: colors.red }}>$5000</BoldText>
+          <BoldText style={{ color: colors.red }}>5000</BoldText>
         </Box>
         <Spacer />
         <Box>
           <Label>You are owed</Label>
-          <BoldText style={{ color: colors.primary }}>$5000</BoldText>
+          <BoldText style={{ color: colors.primary }}>5000</BoldText>
         </Box>
       </Flex>
     </BalanceBox>

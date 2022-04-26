@@ -1,23 +1,28 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
+import { connect } from "react-redux";
+import { setTheme, getTheme } from "../../redux/actions/theme";
 
-const useThemeMode = () => {
-  const [theme, setTheme] = useState("light");
-
-  const setMode = (mode) => {
-    // Store Theme mode to the local storage
-    window.localStorage.setItem("theme", mode);
-    setTheme(mode);
-  };
+const useThemeMode = ({ setTheme, getTheme, appliedTheme }) => {
+  // const setMode = (mode) => {
+  //   // Store Theme mode to the local storage
+  //   window.localStorage.setItem("theme", mode);
+  //   setThemeMode(mode);
+  // };
 
   const themeToggler = () =>
-    theme === "dark" ? setMode("light") : setMode("dark");
+    appliedTheme === "dark" ? setTheme("light") : setTheme("dark");
 
   useEffect(() => {
-    const localTheme = window.localStorage.getItem("theme");
-    localTheme && setTheme(localTheme);
-  }, []);
+    // const localTheme = window.localStorage.getItem("theme");
+    // localTheme && setThemeMode(localTheme);
+    getTheme();
+  }, [getTheme]);
 
-  return { theme, themeToggler };
+  return [appliedTheme, themeToggler];
 };
 
-export default useThemeMode;
+const mapStateToProps = (state) => ({
+  loading: state.theme.loading,
+  appliedTheme: state.theme.mode,
+});
+export default connect(mapStateToProps, { setTheme, getTheme })(useThemeMode);

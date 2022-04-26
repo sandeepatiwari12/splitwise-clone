@@ -101,6 +101,11 @@ const AddExpence = ({
       onClose();
     }
   };
+  const onUpdateSplitby = () => {
+    const filteredSplits = formObj.splits.filter((e) => !e.exclude);
+    setFormObj({ ...formObj, splits: filteredSplits });
+    openSplitBy(false);
+  }
 
   return (
     <>
@@ -193,7 +198,11 @@ const AddExpence = ({
         )}
       </form>
       {splitByOpened && (
-        <Modal onClose={() => openSplitBy(false)} title={"Exclude friends"} small>
+        <Modal
+          onClose={() => openSplitBy(false)}
+          title={"Exclude friends"}
+          small
+        >
           {formObj.splits &&
             formObj.splits.length > 0 &&
             formObj.splits.map((friend) => (
@@ -215,6 +224,8 @@ const AddExpence = ({
                 </Label>
               </BoldText>
             ))}
+
+          <Button type="button" onClick={onUpdateSplitby}>Done</Button>
         </Modal>
       )}
     </>
